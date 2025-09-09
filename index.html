@@ -17,13 +17,16 @@
     <img src="logo.png" alt="Overlay Jewels Logo" class="logo-icon" />
   </div>
 
+  <!-- UI Buttons -->
   <div class="ui-buttons">
     <a id="location-btn" href="https://www.google.com/maps/place/50,+VP+St,+Vannarpet,+Coonoor,+Tamil+Nadu+643101" target="_blank" rel="noopener noreferrer">
       <img src="location_icon.png" alt="Location" />
     </a>
+    <button id="snapshot-btn">📸</button>
     <button id="info-btn" onclick="toggleInfoModal()">ℹ️</button>
   </div>
   
+  <!-- Jewelry Mode -->
   <div id="jewelry-mode" class="button-group">
     <button onclick="toggleCategory('earrings')">EARRINGS</button>
     <button onclick="toggleCategory('necklaces')">CHAINS</button>
@@ -31,13 +34,16 @@
     <button onclick="toggleCategory('ring')">Rings</button>
   </div>
 
+  <!-- Subcategories -->
   <div id="subcategory-buttons" class="button-group" style="display: none;">
     <button onclick="selectJewelryType(currentType, 'gold')">Gold</button>
     <button onclick="selectJewelryType(currentType, 'diamond')">Diamond</button>
   </div>
   
+  <!-- Jewelry Options -->
   <div id="jewelry-options" class="options-group" style="display: none;"></div>
   
+  <!-- Info Modal -->
   <dialog id="info-modal">
     <h3>How to Use the Try-On App</h3>
     <div class="info-content">
@@ -52,28 +58,21 @@
     </div>
   </dialog>
 
+  <!-- Snapshot Modal -->
+  <dialog id="snapshot-modal">
+    <h3>Preview</h3>
+    <img id="snapshot-preview" />
+    <div class="snapshot-buttons">
+      <button onclick="downloadSnapshot()">Download</button>
+      <button onclick="shareOnWhatsApp()">Share on WhatsApp</button>
+      <button onclick="closeSnapshot()">Close</button>
+    </div>
+  </dialog>
+
+  <!-- Scripts -->
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
-  <script src="script.js"></script> 
-  <div class="ui-buttons">
-  <a id="location-btn" href="https://www.google.com/maps/place/50,+VP+St,+Vannarpet,+Coonoor,+Tamil+Nadu+643101" target="_blank" rel="noopener noreferrer">
-    <img src="location_icon.png" alt="Location" />
-  </a>
-  <button id="snapshot-btn">📸</button>
-  <button id="info-btn" onclick="toggleInfoModal()">ℹ️</button>
-</div>
-
-<!-- Snapshot Modal -->
-<dialog id="snapshot-modal">
-  <h3>Preview</h3>
-  <img id="snapshot-preview" />
-  <div class="snapshot-buttons">
-    <button onclick="downloadSnapshot()">Download</button>
-    <button onclick="shareOnWhatsApp()">Share on WhatsApp</button>
-    <button onclick="closeSnapshot()">Close</button>
-  </div>
-</dialog>
-
+  <script src="script.js"></script>
 </body>
 </html>
