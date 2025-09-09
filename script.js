@@ -2,7 +2,6 @@ const videoElement = document.getElementById('webcam');
 const canvasElement = document.getElementById('overlay');
 const canvasCtx = canvasElement.getContext('2d');
 
-const infoModal = document.getElementById('info-modal');
 const subcategoryButtons = document.getElementById('subcategory-buttons');
 const jewelryOptions = document.getElementById('jewelry-options');
 
@@ -23,7 +22,6 @@ let smoothedFacePoints = {};
 // ================== GOOGLE DRIVE CONFIG ==================
 const API_KEY = "AIzaSyA1JCqs3gl6TMVz1cwPIsTD2sefDPRr8OY"; 
 
-// Map jewelry type → Google Drive Folder ID
 const driveFolders = {
   gold_earrings: "16wvDBpxaMgObqTQBxpM0PH1OAZbcNXcj",
   gold_necklaces: "1csT7TYA8lMbyuuIYAk2cMVYK9lRIT5Gz",
@@ -33,7 +31,6 @@ const driveFolders = {
   ring: "1NT1iOKj8FSJgwGVF41ngPqsh7UAX6Ykw",
 };
 
-// Fetch image links from a Drive folder
 async function fetchDriveImages(folderId) {
   const url = `https://www.googleapis.com/drive/v3/files?q='${folderId}'+in+parents&key=${API_KEY}&fields=files(id,name,mimeType)`;
   const res = await fetch(url);
@@ -50,9 +47,6 @@ async function fetchDriveImages(folderId) {
     });
 }
 
-// =========================================================
-
-// Utility function to load images
 async function loadImage(src) {
   return new Promise((resolve) => {
     const img = new Image();
@@ -65,7 +59,6 @@ async function loadImage(src) {
   });
 }
 
-// Change jewelry image
 async function changeJewelry(type, src) {
   const img = await loadImage(src);
   if (!img) return;
@@ -78,7 +71,6 @@ async function changeJewelry(type, src) {
   else if (type.includes('ring')) ringImg = img;
 }
 
-// Handle category selection
 function toggleCategory(category) {
   jewelryOptions.style.display = 'none';
   subcategoryButtons.style.display = 'none';
@@ -95,7 +87,6 @@ function toggleCategory(category) {
   }
 }
 
-// Handle subcategory (Gold/Diamond)
 function selectJewelryType(mainType, subType) {
   currentType = `${subType}_${mainType}`;
   subcategoryButtons.style.display = 'none';
@@ -103,7 +94,6 @@ function selectJewelryType(mainType, subType) {
   insertJewelryOptions(currentType, 'jewelry-options');
 }
 
-// Insert jewelry options (from Google Drive)
 async function insertJewelryOptions(type, containerId) {
   const container = document.getElementById(containerId);
   container.innerHTML = '';
@@ -126,7 +116,6 @@ async function insertJewelryOptions(type, containerId) {
   });
 }
 
-// ================== MEDIAPIPE ==================
 const faceMesh = new FaceMesh({
   locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`,
 });
@@ -161,7 +150,6 @@ faceMesh.onResults((results) => {
   drawJewelry(smoothedFaceLandmarks, smoothedHandLandmarks, canvasCtx);
 });
 
-// Start camera
 async function startCamera(facingMode) {
   if (camera) camera.stop();
   camera = new Camera(videoElement, {
@@ -183,7 +171,6 @@ videoElement.addEventListener('loadedmetadata', () => {
   canvasElement.height = videoElement.videoHeight;
 });
 
-// =============== Smoothing Helper ==================
 function smoothPoint(prev, current, factor = 0.4) {
   if (!prev) return current;
   return {
@@ -192,7 +179,6 @@ function smoothPoint(prev, current, factor = 0.4) {
   };
 }
 
-// Draw jewelry
 function drawJewelry(faceLandmarks, handLandmarks, ctx) {
   const earringScale = 0.078;
   const necklaceScale = 0.252;
@@ -209,7 +195,6 @@ function drawJewelry(faceLandmarks, handLandmarks, ctx) {
     let rightEarPos = { x: rightEarLandmark.x * canvasElement.width + 6, y: rightEarLandmark.y * canvasElement.height - 16 };
     let neckPos = { x: neckLandmark.x * canvasElement.width - 8, y: neckLandmark.y * canvasElement.height + 10 };
 
-    // Smooth positions
     smoothedFacePoints.leftEar = smoothPoint(smoothedFacePoints.leftEar, leftEarPos);
     smoothedFacePoints.rightEar = smoothPoint(smoothedFacePoints.rightEar, rightEarPos);
     smoothedFacePoints.neck = smoothPoint(smoothedFacePoints.neck, neckPos);
@@ -229,7 +214,6 @@ function drawJewelry(faceLandmarks, handLandmarks, ctx) {
     handLandmarks.forEach((hand, idx) => {
       const wristPos = { x: hand[0].x * canvasElement.width, y: hand[0].y * canvasElement.height };
       const middleFingerPos = { x: hand[9].x * canvasElement.width, y: hand[9].y * canvasElement.height };
-
       const angle = Math.atan2(middleFingerPos.y - wristPos.y, middleFingerPos.x - wristPos.x);
 
       if (braceletImg) {
@@ -245,8 +229,6 @@ function drawJewelry(faceLandmarks, handLandmarks, ctx) {
 
       if (ringImg) {
         const w = ringImg.width * ringScale, h = ringImg.height * ringScale;
-
-        // Midpoint between 13 & 14
         const ringBase = { x: hand[13].x * canvasElement.width, y: hand[13].y * canvasElement.height };
         const ringKnuckle = { x: hand[14].x * canvasElement.width, y: hand[14].y * canvasElement.height };
         let currentPos = {
@@ -261,10 +243,4 @@ function drawJewelry(faceLandmarks, handLandmarks, ctx) {
       }
     });
   }
-}
-
-// Info modal
-function toggleInfoModal() {
-  if (infoModal.open) infoModal.close();
-  else infoModal.showModal();
 }

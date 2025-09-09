@@ -51,7 +51,6 @@ video, canvas {
   margin-right: 8px;
 }
 
-/* Main Jewelry Category Buttons (EARRINGS, CHAINS, etc.) */
 #jewelry-mode {
   position: fixed;
   bottom: 10px;
@@ -82,7 +81,6 @@ video, canvas {
   background-color: #3b0764;
 }
 
-/* Subcategory Buttons (Gold/Diamond) */
 #subcategory-buttons {
   position: fixed;
   bottom: 130px;
@@ -109,7 +107,6 @@ video, canvas {
   font-weight: bold;
 }
 
-/* Jewelry Options Scroll List */
 .options-group {
   position: fixed;
   bottom: 70px;
@@ -150,7 +147,6 @@ video, canvas {
   transform: scale(1.05);
 }
 
-/* UI Buttons (Snapshot, Location, Info) */
 .ui-buttons {
   position: fixed;
   top: 20px;
@@ -181,66 +177,4 @@ video, canvas {
 .ui-buttons button img, .ui-buttons a img {
   width: 25px;
   height: 25px;
-}
-
-/* Info Modal */
-#info-modal {
-  display: none;
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background: rgba(0, 0, 0, 0.9);
-  color: white;
-  padding: 30px;
-  border-radius: 12px;
-  z-index: 9999;
-  max-width: 90%;
-  width: 400px;
-}
-
-.info-content ul {
-  padding-left: 20px;
-  line-height: 1.6;
-}
-
-.close-btn {
-  background-color: #5E0F8B;
-  color: #ffffff;
-  border: none;
-  padding: 10px 15px;
-  border-radius: 8px;
-  cursor: pointer;
-  margin-top: 20px;
-}
-
-/* Snapshot Modal */
-#snapshot-modal {
-  display: none;
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background: #fff;
-  border-radius: 12px;
-  padding: 20px;
-  text-align: center;
-  z-index: 9999;
-}
-
-#snapshot-preview {
-  width: 100%;
-  max-width: 400px;
-  border-radius: 10px;
-  margin-bottom: 10px;
-}
-
-.snapshot-buttons button {
-  margin: 5px;
-  padding: 10px 16px;
-  border: none;
-  border-radius: 8px;
-  background: #5E0F8B;
-  color: #ffffff;
-  cursor: pointer;
 }
