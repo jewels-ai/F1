@@ -173,14 +173,17 @@ async function startCamera(facingMode) {
 document.addEventListener('DOMContentLoaded', () => {
   startCamera('user');
 
-  // Snapshot event listeners
   captureBtn.addEventListener('click', () => {
+    // Force redraw before capturing
+    drawJewelry(smoothedFaceLandmarks, smoothedHandLandmarks, canvasCtx);
+
     const snapshotCanvas = document.createElement('canvas');
     snapshotCanvas.width = canvasElement.width;
     snapshotCanvas.height = canvasElement.height;
     const snapshotCtx = snapshotCanvas.getContext('2d');
     snapshotCtx.drawImage(videoElement, 0, 0, snapshotCanvas.width, snapshotCanvas.height);
     snapshotCtx.drawImage(canvasElement, 0, 0, snapshotCanvas.width, snapshotCanvas.height);
+
     snapshotPreview.src = snapshotCanvas.toDataURL('image/png');
     snapshotModal.style.display = 'block';
   });
