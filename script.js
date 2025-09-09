@@ -268,3 +268,41 @@ function toggleInfoModal() {
   if (infoModal.open) infoModal.close();
   else infoModal.showModal();
 }
+const snapshotBtn = document.getElementById('snapshot-btn');
+const snapshotModal = document.getElementById('snapshot-modal');
+const snapshotPreview = document.getElementById('snapshot-preview');
+
+snapshotBtn.addEventListener('click', takeSnapshot);
+
+function takeSnapshot() {
+  const snapshotCanvas = document.createElement('canvas');
+  snapshotCanvas.width = videoElement.videoWidth;
+  snapshotCanvas.height = videoElement.videoHeight;
+  const ctx = snapshotCanvas.getContext('2d');
+
+  // Draw video + overlay
+  ctx.drawImage(videoElement, 0, 0, snapshotCanvas.width, snapshotCanvas.height);
+  ctx.drawImage(canvasElement, 0, 0, snapshotCanvas.width, snapshotCanvas.height);
+
+  // Show preview
+  snapshotPreview.src = snapshotCanvas.toDataURL("image/png");
+  snapshotModal.showModal();
+}
+
+function downloadSnapshot() {
+  const link = document.createElement('a');
+  link.href = snapshotPreview.src;
+  link.download = "jewelry-tryon.png";
+  link.click();
+}
+
+function shareOnWhatsApp() {
+  const message = "Check out how this jewelry looks on me! 💎✨";
+  const url = snapshotPreview.src;
+  const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}%20${encodeURIComponent(url)}`;
+  window.open(whatsappUrl, "_blank");
+}
+
+function closeSnapshot() {
+  snapshotModal.close();
+}

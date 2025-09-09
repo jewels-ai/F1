@@ -55,6 +55,25 @@
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
-  <script src="script.js"></script>
+  <script src="script.js"></script> 
+  <div class="ui-buttons">
+  <a id="location-btn" href="https://www.google.com/maps/place/50,+VP+St,+Vannarpet,+Coonoor,+Tamil+Nadu+643101" target="_blank" rel="noopener noreferrer">
+    <img src="location_icon.png" alt="Location" />
+  </a>
+  <button id="snapshot-btn">📸</button>
+  <button id="info-btn" onclick="toggleInfoModal()">ℹ️</button>
+</div>
+
+<!-- Snapshot Modal -->
+<dialog id="snapshot-modal">
+  <h3>Preview</h3>
+  <img id="snapshot-preview" />
+  <div class="snapshot-buttons">
+    <button onclick="downloadSnapshot()">Download</button>
+    <button onclick="shareOnWhatsApp()">Share on WhatsApp</button>
+    <button onclick="closeSnapshot()">Close</button>
+  </div>
+</dialog>
+
 </body>
 </html>

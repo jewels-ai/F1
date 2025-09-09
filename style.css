@@ -244,3 +244,23 @@ video, canvas {
   color: #ffffff;
   cursor: pointer;
 }
+.snapshot-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+.snapshot-buttons button {
+  margin: 5px;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 8px;
+  background: #5E0F8B;
+  color: #ffffff;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.snapshot-buttons button:hover {
+  background: #3b0764;
+}
