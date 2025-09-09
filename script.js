@@ -174,16 +174,19 @@ document.addEventListener('DOMContentLoaded', () => {
   startCamera('user');
 
   captureBtn.addEventListener('click', () => {
-    // Force redraw before capturing
-    drawJewelry(smoothedFaceLandmarks, smoothedHandLandmarks, canvasCtx);
-
+    // Create a new canvas to combine video and overlay
     const snapshotCanvas = document.createElement('canvas');
     snapshotCanvas.width = canvasElement.width;
     snapshotCanvas.height = canvasElement.height;
     const snapshotCtx = snapshotCanvas.getContext('2d');
-    snapshotCtx.drawImage(videoElement, 0, 0, snapshotCanvas.width, snapshotCanvas.height);
-    snapshotCtx.drawImage(canvasElement, 0, 0, snapshotCanvas.width, snapshotCanvas.height);
 
+    // Draw video frame
+    snapshotCtx.drawImage(videoElement, 0, 0, snapshotCanvas.width, snapshotCanvas.height);
+
+    // Draw jewelry overlay using current landmarks
+    drawJewelry(smoothedFaceLandmarks, smoothedHandLandmarks, snapshotCtx);
+
+    // Set preview and show modal
     snapshotPreview.src = snapshotCanvas.toDataURL('image/png');
     snapshotModal.style.display = 'block';
   });
