@@ -51,6 +51,7 @@ video, canvas {
   margin-right: 8px;
 }
 
+/* Main Jewelry Category Buttons */
 #jewelry-mode {
   position: fixed;
   bottom: 10px;
@@ -81,13 +82,13 @@ video, canvas {
   background-color: #3b0764;
 }
 
+/* Subcategory Buttons (Gold / Diamond) */
 #subcategory-buttons {
   position: fixed;
   bottom: 130px;
   left: 0;
   width: 100%;
   justify-content: center;
-  transform: none;
   z-index: 5;
   display: flex;
   gap: 12px;
@@ -107,12 +108,12 @@ video, canvas {
   font-weight: bold;
 }
 
+/* Jewelry Options Scroll List */
 .options-group {
   position: fixed;
   bottom: 70px;
   left: 0;
   width: 100%;
-  transform: none;
   display: flex;
   gap: 15px;
   z-index: 2;
@@ -147,16 +148,18 @@ video, canvas {
   transform: scale(1.05);
 }
 
+/* Floating UI Buttons (snapshot + location) */
 .ui-buttons {
   position: fixed;
   top: 20px;
   right: 20px;
   display: flex;
   gap: 15px;
-  z-index: 5;
+  z-index: 10;
 }
 
-.ui-buttons button, .ui-buttons a {
+.ui-buttons button,
+.ui-buttons a {
   background: rgba(255, 255, 255, 0.2);
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.3);
@@ -170,33 +173,42 @@ video, canvas {
   transition: all 0.3s ease;
 }
 
-.ui-buttons button:hover, .ui-buttons a:hover {
+.ui-buttons button:hover,
+.ui-buttons a:hover {
   background: rgba(255, 255, 255, 0.4);
 }
 
-.ui-buttons button img, .ui-buttons a img {
+.ui-buttons img {
   width: 25px;
   height: 25px;
 }
 
 /* Snapshot Modal */
 #snapshot-modal {
+  display: none;
   position: fixed;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  background: #111;
-  padding: 20px;
+  background: #fff;
   border-radius: 12px;
+  padding: 20px;
   text-align: center;
   z-index: 9999;
+  max-width: 90%;
+  width: 400px;
+}
+
+#snapshot-modal h3 {
+  margin-bottom: 12px;
+  color: #333;
 }
 
 #snapshot-preview {
-  max-width: 90vw;
-  max-height: 70vh;
+  width: 100%;
+  max-width: 400px;
   border-radius: 10px;
-  margin-bottom: 15px;
+  margin-bottom: 10px;
 }
 
 .snapshot-buttons button {
@@ -205,7 +217,11 @@ video, canvas {
   border: none;
   border-radius: 8px;
   background: #5E0F8B;
-  color: #fff;
+  color: #ffffff;
   cursor: pointer;
   font-weight: bold;
+}
+
+.snapshot-buttons button:hover {
+  background: #3b0764;
 }

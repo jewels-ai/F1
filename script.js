@@ -5,29 +5,18 @@ const canvasCtx = canvasElement.getContext('2d');
 const subcategoryButtons = document.getElementById('subcategory-buttons');
 const jewelryOptions = document.getElementById('jewelry-options');
 
-const captureBtn = document.getElementById('capture-btn');
-const snapshotModal = document.getElementById('snapshot-modal');
-const snapshotPreview = document.getElementById('snapshot-preview');
-const shareBtn = document.getElementById('share-btn');
-const closeSnapshotBtn = document.getElementById('close-snapshot-btn');
-
-let earringImg = null;
-let necklaceImg = null;
-let braceletImg = null;
-let ringImg = null;
-
+let earringImg = null, necklaceImg = null, braceletImg = null, ringImg = null;
 let currentType = '';
 let smoothedFaceLandmarks = null;
 let smoothedHandLandmarks = null;
 let camera;
 
-// Store smoothed jewelry positions
 let smoothedHandPoints = {};
 let smoothedFacePoints = {};
+let lastSnapshotDataURL = '';
 
 // ================== GOOGLE DRIVE CONFIG ==================
 const API_KEY = "AIzaSyA1JCqs3gl6TMVz1cwPIsTD2sefDPRr8OY"; 
-
 const driveFolders = {
   gold_earrings: "16wvDBpxaMgObqTQBxpM0PH1OAZbcNXcj",
   gold_necklaces: "1csT7TYA8lMbyuuIYAk2cMVYK9lRIT5Gz",
@@ -41,26 +30,17 @@ async function fetchDriveImages(folderId) {
   const url = `https://www.googleapis.com/drive/v3/files?q='${folderId}'+in+parents&key=${API_KEY}&fields=files(id,name,mimeType)`;
   const res = await fetch(url);
   const data = await res.json();
-
   if (!data.files) return [];
-
   return data.files
     .filter(f => f.mimeType.includes("image/"))
-    .map(f => {
-      const link = `https://drive.google.com/thumbnail?id=${f.id}&sz=w1000`;
-      console.log("Image loaded:", link);
-      return { id: f.id, name: f.name, src: link };
-    });
+    .map(f => ({ id: f.id, name: f.name, src: `https://drive.google.com/thumbnail?id=${f.id}&sz=w1000` }));
 }
 
 async function loadImage(src) {
   return new Promise((resolve) => {
     const img = new Image();
     img.onload = () => resolve(img);
-    img.onerror = () => {
-      console.error(`Failed to load image: ${src}`);
-      resolve(null);
-    };
+    img.onerror = () => resolve(null);
     img.src = src;
   });
 }
@@ -68,9 +48,7 @@ async function loadImage(src) {
 async function changeJewelry(type, src) {
   const img = await loadImage(src);
   if (!img) return;
-
   earringImg = necklaceImg = braceletImg = ringImg = null;
-
   if (type.includes('earrings')) earringImg = img;
   else if (type.includes('necklaces')) necklaceImg = img;
   else if (type.includes('bracelet')) braceletImg = img;
@@ -81,7 +59,6 @@ function toggleCategory(category) {
   jewelryOptions.style.display = 'none';
   subcategoryButtons.style.display = 'none';
   currentType = category;
-
   const isAccessoryCategory = ['bracelet', 'ring'].includes(category);
   if (isAccessoryCategory) {
     insertJewelryOptions(category, 'jewelry-options');
@@ -103,14 +80,8 @@ function selectJewelryType(mainType, subType) {
 async function insertJewelryOptions(type, containerId) {
   const container = document.getElementById(containerId);
   container.innerHTML = '';
-
-  if (!driveFolders[type]) {
-    console.error("No Google Drive folder mapped for:", type);
-    return;
-  }
-
+  if (!driveFolders[type]) return;
   const images = await fetchDriveImages(driveFolders[type]);
-
   images.forEach((file, i) => {
     const btn = document.createElement('button');
     const img = document.createElement('img');
@@ -122,6 +93,7 @@ async function insertJewelryOptions(type, containerId) {
   });
 }
 
+// ===== Mediapipe setup =====
 const faceMesh = new FaceMesh({
   locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`,
 });
@@ -138,18 +110,16 @@ hands.onResults((results) => {
 
 faceMesh.onResults((results) => {
   canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
-  if (results.multiFaceLandmarks && results.multiFaceLandmarks.length > 0) {
+  if (results.multiFaceLandmarks?.length > 0) {
     const newLandmarks = results.multiFaceLandmarks[0];
-    if (!smoothedFaceLandmarks) {
-      smoothedFaceLandmarks = newLandmarks;
-    } else {
-      const smoothingFactor = 0.2;
-      smoothedFaceLandmarks = smoothedFaceLandmarks.map((prev, i) => ({
-        x: prev.x * (1 - smoothingFactor) + newLandmarks[i].x * smoothingFactor,
-        y: prev.y * (1 - smoothingFactor) + newLandmarks[i].y * smoothingFactor,
-        z: prev.z * (1 - smoothingFactor) + newLandmarks[i].z * smoothingFactor,
-      }));
-    }
+    const factor = 0.2;
+    smoothedFaceLandmarks = smoothedFaceLandmarks
+      ? smoothedFaceLandmarks.map((prev, i) => ({
+          x: prev.x * (1 - factor) + newLandmarks[i].x * factor,
+          y: prev.y * (1 - factor) + newLandmarks[i].y * factor,
+          z: prev.z * (1 - factor) + newLandmarks[i].z * factor,
+        }))
+      : newLandmarks;
   } else {
     smoothedFaceLandmarks = null;
   }
@@ -170,52 +140,7 @@ async function startCamera(facingMode) {
   camera.start();
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-  startCamera('user');
-
-  captureBtn.addEventListener('click', () => {
-    // Create a new canvas to combine video and overlay
-    const snapshotCanvas = document.createElement('canvas');
-    snapshotCanvas.width = canvasElement.width;
-    snapshotCanvas.height = canvasElement.height;
-    const snapshotCtx = snapshotCanvas.getContext('2d');
-
-    // Draw video frame
-    snapshotCtx.drawImage(videoElement, 0, 0, snapshotCanvas.width, snapshotCanvas.height);
-
-    // Draw jewelry overlay using current landmarks
-    drawJewelry(smoothedFaceLandmarks, smoothedHandLandmarks, snapshotCtx);
-
-    // Set preview and show modal
-    snapshotPreview.src = snapshotCanvas.toDataURL('image/png');
-    snapshotModal.style.display = 'block';
-  });
-
-  closeSnapshotBtn.addEventListener('click', () => {
-    snapshotModal.style.display = 'none';
-  });
-
-  shareBtn.addEventListener('click', async () => {
-    if (!navigator.canShare || !navigator.canShare()) {
-      alert('Sharing is not supported on this browser.');
-      return;
-    }
-    try {
-      const response = await fetch(snapshotPreview.src);
-      const blob = await response.blob();
-      const file = new File([blob], 'jewelry.png', { type: blob.type });
-      await navigator.share({
-        files: [file],
-        title: 'My Jewelry Try-On',
-        text: 'Check out how I look with this jewelry!'
-      });
-    } catch (err) {
-      console.error('Share failed:', err);
-      alert('Sharing failed.');
-    }
-  });
-});
-
+document.addEventListener('DOMContentLoaded', () => startCamera('user'));
 videoElement.addEventListener('loadedmetadata', () => {
   canvasElement.width = videoElement.videoWidth;
   canvasElement.height = videoElement.videoHeight;
@@ -223,32 +148,18 @@ videoElement.addEventListener('loadedmetadata', () => {
 
 function smoothPoint(prev, current, factor = 0.4) {
   if (!prev) return current;
-  return {
-    x: prev.x * (1 - factor) + current.x * factor,
-    y: prev.y * (1 - factor) + current.y * factor
-  };
+  return { x: prev.x * (1 - factor) + current.x * factor, y: prev.y * (1 - factor) + current.y * factor };
 }
 
 function drawJewelry(faceLandmarks, handLandmarks, ctx) {
-  const earringScale = 0.078;
-  const necklaceScale = 0.252;
-  const braceletScale = 0.28;
-  const ringScale = 0.1;
-  const angleOffset = Math.PI / 2;
-
+  const earringScale = 0.078, necklaceScale = 0.252, braceletScale = 0.28, ringScale = 0.1, angleOffset = Math.PI / 2;
   if (faceLandmarks) {
-    const leftEarLandmark = faceLandmarks[132];
-    const rightEarLandmark = faceLandmarks[361];
-    const neckLandmark = faceLandmarks[152];
-
-    let leftEarPos = { x: leftEarLandmark.x * canvasElement.width - 6, y: leftEarLandmark.y * canvasElement.height - 16 };
-    let rightEarPos = { x: rightEarLandmark.x * canvasElement.width + 6, y: rightEarLandmark.y * canvasElement.height - 16 };
-    let neckPos = { x: neckLandmark.x * canvasElement.width - 8, y: neckLandmark.y * canvasElement.height + 10 };
-
-    smoothedFacePoints.leftEar = smoothPoint(smoothedFacePoints.leftEar, leftEarPos);
-    smoothedFacePoints.rightEar = smoothPoint(smoothedFacePoints.rightEar, rightEarPos);
-    smoothedFacePoints.neck = smoothPoint(smoothedFacePoints.neck, neckPos);
-
+    const leftEar = { x: faceLandmarks[132].x * canvasElement.width - 6, y: faceLandmarks[132].y * canvasElement.height - 16 };
+    const rightEar = { x: faceLandmarks[361].x * canvasElement.width + 6, y: faceLandmarks[361].y * canvasElement.height - 16 };
+    const neck = { x: faceLandmarks[152].x * canvasElement.width - 8, y: faceLandmarks[152].y * canvasElement.height + 10 };
+    smoothedFacePoints.leftEar = smoothPoint(smoothedFacePoints.leftEar, leftEar);
+    smoothedFacePoints.rightEar = smoothPoint(smoothedFacePoints.rightEar, rightEar);
+    smoothedFacePoints.neck = smoothPoint(smoothedFacePoints.neck, neck);
     if (earringImg) {
       const w = earringImg.width * earringScale, h = earringImg.height * earringScale;
       ctx.drawImage(earringImg, smoothedFacePoints.leftEar.x - w / 2, smoothedFacePoints.leftEar.y, w, h);
@@ -259,13 +170,11 @@ function drawJewelry(faceLandmarks, handLandmarks, ctx) {
       ctx.drawImage(necklaceImg, smoothedFacePoints.neck.x - w / 2, smoothedFacePoints.neck.y, w, h);
     }
   }
-
   if (handLandmarks) {
     handLandmarks.forEach((hand, idx) => {
       const wristPos = { x: hand[0].x * canvasElement.width, y: hand[0].y * canvasElement.height };
       const middleFingerPos = { x: hand[9].x * canvasElement.width, y: hand[9].y * canvasElement.height };
       const angle = Math.atan2(middleFingerPos.y - wristPos.y, middleFingerPos.x - wristPos.x);
-
       if (braceletImg) {
         const w = braceletImg.width * braceletScale, h = braceletImg.height * braceletScale;
         const key = `bracelet_${idx}`;
@@ -276,21 +185,58 @@ function drawJewelry(faceLandmarks, handLandmarks, ctx) {
         ctx.drawImage(braceletImg, -w / 2, -h / 2, w, h);
         ctx.restore();
       }
-
       if (ringImg) {
         const w = ringImg.width * ringScale, h = ringImg.height * ringScale;
         const ringBase = { x: hand[13].x * canvasElement.width, y: hand[13].y * canvasElement.height };
         const ringKnuckle = { x: hand[14].x * canvasElement.width, y: hand[14].y * canvasElement.height };
-        let currentPos = {
-          x: (ringBase.x + ringKnuckle.x) / 2,
-          y: (ringBase.y + ringKnuckle.y) / 2
-        };
-
+        let currentPos = { x: (ringBase.x + ringKnuckle.x) / 2, y: (ringBase.y + ringKnuckle.y) / 2 };
         const key = `ring_${idx}`;
         smoothedHandPoints[key] = smoothPoint(smoothedHandPoints[key], currentPos);
-
         ctx.drawImage(ringImg, smoothedHandPoints[key].x - w / 2, smoothedHandPoints[key].y - h / 2, w, h);
       }
     });
   }
+}
+
+// ====== SNAPSHOT FUNCTIONS ======
+function takeSnapshot() {
+  if (!smoothedFaceLandmarks && !smoothedHandLandmarks) {
+    alert("No jewelry detected. Try again!");
+    return;
+  }
+  const snapshotCanvas = document.createElement('canvas');
+  snapshotCanvas.width = videoElement.videoWidth;
+  snapshotCanvas.height = videoElement.videoHeight;
+  const ctx = snapshotCanvas.getContext('2d');
+  ctx.drawImage(videoElement, 0, 0, snapshotCanvas.width, snapshotCanvas.height);
+  drawJewelry(smoothedFaceLandmarks, smoothedHandLandmarks, ctx);
+  lastSnapshotDataURL = snapshotCanvas.toDataURL('image/png');
+  document.getElementById('snapshot-preview').src = lastSnapshotDataURL;
+  document.getElementById('snapshot-modal').style.display = 'block';
+}
+
+function saveSnapshot() {
+  const link = document.createElement('a');
+  link.href = lastSnapshotDataURL;
+  link.download = `jewelry-tryon-${Date.now()}.png`;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
+
+function shareSnapshot() {
+  if (navigator.share) {
+    fetch(lastSnapshotDataURL)
+      .then(res => res.blob())
+      .then(blob => {
+        const file = new File([blob], 'jewelry-tryon.png', { type: 'image/png' });
+        navigator.share({ title: 'Jewelry Try-On', text: 'Check out my look!', files: [file] });
+      });
+  } else {
+    alert('Sharing not supported on this browser.');
+  }
+}
+
+function closeSnapshotModal() {
+  document.getElementById('snapshot-modal').style.display = 'none';
 }

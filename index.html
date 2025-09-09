@@ -17,13 +17,17 @@
     <img src="logo.png" alt="Overlay Jewels Logo" class="logo-icon" />
   </div>
 
+  <!-- Floating UI Buttons -->
   <div class="ui-buttons">
+    <button id="snapshot-btn" onclick="takeSnapshot()">
+      <img src="camera-icon.png" alt="Snapshot" />
+    </button>
     <a id="location-btn" href="https://www.google.com/maps/place/50,+VP+St,+Vannarpet,+Coonoor,+Tamil+Nadu+643101" target="_blank" rel="noopener noreferrer">
       <img src="location_icon.png" alt="Location" />
     </a>
-    <button id="capture-btn">📸</button>
   </div>
   
+  <!-- Jewelry Category -->
   <div id="jewelry-mode" class="button-group">
     <button onclick="toggleCategory('earrings')">EARRINGS</button>
     <button onclick="toggleCategory('necklaces')">CHAINS</button>
@@ -31,19 +35,23 @@
     <button onclick="toggleCategory('ring')">Rings</button>
   </div>
 
+  <!-- Subcategory -->
   <div id="subcategory-buttons" class="button-group" style="display: none;">
     <button onclick="selectJewelryType(currentType, 'gold')">Gold</button>
     <button onclick="selectJewelryType(currentType, 'diamond')">Diamond</button>
   </div>
   
+  <!-- Jewelry Options -->
   <div id="jewelry-options" class="options-group" style="display: none;"></div>
 
   <!-- Snapshot Modal -->
-  <div id="snapshot-modal" style="display: none;">
+  <div id="snapshot-modal">
+    <h3>Snapshot Preview</h3>
     <img id="snapshot-preview" src="" alt="Snapshot" />
     <div class="snapshot-buttons">
-      <button id="share-btn">Share</button>
-      <button id="close-snapshot-btn">Close</button>
+      <button onclick="saveSnapshot()">Save</button>
+      <button onclick="shareSnapshot()">Share</button>
+      <button onclick="closeSnapshotModal()">Close</button>
     </div>
   </div>
 
