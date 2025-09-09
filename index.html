@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Virtual Jewels Try-On</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel&family=Poppins&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="video-container">
+    <video id="webcam" autoplay muted playsinline></video>
+    <canvas id="overlay"></canvas>
+  </div>
+
+  <div id="branding">
+    <img src="logo.png" alt="Overlay Jewels Logo" class="logo-icon" />
+  </div>
+
+  <div class="ui-buttons">
+    <a id="location-btn" href="https://www.google.com/maps/place/50,+VP+St,+Vannarpet,+Coonoor,+Tamil+Nadu+643101" target="_blank" rel="noopener noreferrer">
+      <img src="location_icon.png" alt="Location" />
+    </a>
+    <button id="info-btn" onclick="toggleInfoModal()">ℹ️</button>
+  </div>
+  
+  <div id="jewelry-mode" class="button-group">
+    <button onclick="toggleCategory('earrings')">EARRINGS</button>
+    <button onclick="toggleCategory('necklaces')">CHAINS</button>
+    <button onclick="toggleCategory('bracelet')">Bracelets</button>
+    <button onclick="toggleCategory('ring')">Rings</button>
+  </div>
+
+  <div id="subcategory-buttons" class="button-group" style="display: none;">
+    <button onclick="selectJewelryType(currentType, 'gold')">Gold</button>
+    <button onclick="selectJewelryType(currentType, 'diamond')">Diamond</button>
+  </div>
+  
+  <div id="jewelry-options" class="options-group" style="display: none;"></div>
+  
+  <dialog id="info-modal">
+    <h3>How to Use the Try-On App</h3>
+    <div class="info-content">
+      <ul>
+        <li>Open the camera and scan the QR code.</li>
+        <li>Allow camera access when prompted.</li>
+        <li>Choose a jewelry item (earrings, necklace, etc.).</li>
+        <li>See it live on your face in real-time!</li>
+        <li>Try different styles and explore.</li>
+      </ul>
+      <button class="close-btn" onclick="toggleInfoModal()">Got it!</button>
+    </div>
+  </dialog>
+
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

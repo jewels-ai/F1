@@ -1,0 +1,246 @@
+@import url('https://fonts.googleapis.com/css2?family=Cinzel&family=Poppins&display=swap');
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body, html {
+  width: 100%;
+  height: 100%;
+  background-color: #0b0b0b;
+  font-family: 'Poppins', sans-serif;
+  color: #fff;
+}
+
+video, canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  object-fit: cover;
+  z-index: 1;
+}
+
+#branding {
+  position: fixed;
+  top: 21px;
+  left: 20px;
+  padding: 8px 12px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  z-index: 5;
+  font-family: 'Cinzel', serif;
+  font-size: 24px;
+  color: #000;
+}
+
+#branding img {
+  width: 80px;
+  height: auto;
+  margin-right: 10px;
+}
+
+.camera-icon {
+  width: 28px;
+  height: 28px;
+  vertical-align: middle;
+  margin-right: 8px;
+}
+
+/* Main Jewelry Category Buttons (EARRINGS, CHAINS, etc.) */
+#jewelry-mode {
+  position: fixed;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: row;
+  gap: 12px;
+  z-index: 5;
+  background: rgba(0, 0, 0, 0.6);
+  padding: 10px 15px;
+  border-radius: 12px;
+  backdrop-filter: blur(8px);
+}
+
+#jewelry-mode button {
+  background-color: #5E0F8B;
+  color: #ffffff;
+  border: none;
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+#jewelry-mode button:hover {
+  background-color: #3b0764;
+}
+
+/* Subcategory Buttons (Gold/Diamond) */
+#subcategory-buttons {
+  position: fixed;
+  bottom: 130px;
+  left: 0;
+  width: 100%;
+  justify-content: center;
+  transform: none;
+  z-index: 5;
+  display: flex;
+  gap: 12px;
+  background: rgba(0, 0, 0, 0.6);
+  padding: 8px 12px;
+  border-radius: 10px;
+  backdrop-filter: blur(8px);
+}
+
+#subcategory-buttons button {
+  background-color: #FFB800;
+  color: #000;
+  border: none;
+  padding: 8px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+/* Jewelry Options Scroll List */
+.options-group {
+  position: fixed;
+  bottom: 70px;
+  left: 0;
+  width: 100%;
+  transform: none;
+  display: flex;
+  gap: 15px;
+  z-index: 2;
+  background: #5E0F8B;
+  backdrop-filter: blur(10px);
+  padding: 10px 20px;
+  border-radius: 16px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.options-group::-webkit-scrollbar {
+  display: none;
+}
+
+.options-group button {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.options-group button img {
+  width: 60px;
+  height: 60px;
+  border-radius: 12px;
+  transition: transform 0.2s ease;
+}
+
+.options-group button:hover img {
+  border: 2px solid #fff;
+  transform: scale(1.05);
+}
+
+/* UI Buttons (Snapshot, Location, Info) */
+.ui-buttons {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  display: flex;
+  gap: 15px;
+  z-index: 5;
+}
+
+.ui-buttons button, .ui-buttons a {
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.ui-buttons button:hover, .ui-buttons a:hover {
+  background: rgba(255, 255, 255, 0.4);
+}
+
+.ui-buttons button img, .ui-buttons a img {
+  width: 25px;
+  height: 25px;
+}
+
+/* Info Modal */
+#info-modal {
+  display: none;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(0, 0, 0, 0.9);
+  color: white;
+  padding: 30px;
+  border-radius: 12px;
+  z-index: 9999;
+  max-width: 90%;
+  width: 400px;
+}
+
+.info-content ul {
+  padding-left: 20px;
+  line-height: 1.6;
+}
+
+.close-btn {
+  background-color: #5E0F8B;
+  color: #ffffff;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-top: 20px;
+}
+
+/* Snapshot Modal */
+#snapshot-modal {
+  display: none;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: #fff;
+  border-radius: 12px;
+  padding: 20px;
+  text-align: center;
+  z-index: 9999;
+}
+
+#snapshot-preview {
+  width: 100%;
+  max-width: 400px;
+  border-radius: 10px;
+  margin-bottom: 10px;
+}
+
+.snapshot-buttons button {
+  margin: 5px;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 8px;
+  background: #5E0F8B;
+  color: #ffffff;
+  cursor: pointer;
+}
