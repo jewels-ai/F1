@@ -4,7 +4,12 @@ const canvasCtx = canvasElement.getContext('2d');
 
 const subcategoryButtons = document.getElementById('subcategory-buttons');
 const jewelryOptions = document.getElementById('jewelry-options');
+
 const captureBtn = document.getElementById('capture-btn');
+const snapshotModal = document.getElementById('snapshot-modal');
+const snapshotPreview = document.getElementById('snapshot-preview');
+const shareBtn = document.getElementById('share-btn');
+const closeSnapshotBtn = document.getElementById('close-snapshot-btn');
 
 let earringImg = null;
 let necklaceImg = null;
@@ -165,7 +170,45 @@ async function startCamera(facingMode) {
   camera.start();
 }
 
-document.addEventListener('DOMContentLoaded', () => startCamera('user'));
+document.addEventListener('DOMContentLoaded', () => {
+  startCamera('user');
+
+  // Snapshot event listeners
+  captureBtn.addEventListener('click', () => {
+    const snapshotCanvas = document.createElement('canvas');
+    snapshotCanvas.width = canvasElement.width;
+    snapshotCanvas.height = canvasElement.height;
+    const snapshotCtx = snapshotCanvas.getContext('2d');
+    snapshotCtx.drawImage(videoElement, 0, 0, snapshotCanvas.width, snapshotCanvas.height);
+    snapshotCtx.drawImage(canvasElement, 0, 0, snapshotCanvas.width, snapshotCanvas.height);
+    snapshotPreview.src = snapshotCanvas.toDataURL('image/png');
+    snapshotModal.style.display = 'block';
+  });
+
+  closeSnapshotBtn.addEventListener('click', () => {
+    snapshotModal.style.display = 'none';
+  });
+
+  shareBtn.addEventListener('click', async () => {
+    if (!navigator.canShare || !navigator.canShare()) {
+      alert('Sharing is not supported on this browser.');
+      return;
+    }
+    try {
+      const response = await fetch(snapshotPreview.src);
+      const blob = await response.blob();
+      const file = new File([blob], 'jewelry.png', { type: blob.type });
+      await navigator.share({
+        files: [file],
+        title: 'My Jewelry Try-On',
+        text: 'Check out how I look with this jewelry!'
+      });
+    } catch (err) {
+      console.error('Share failed:', err);
+      alert('Sharing failed.');
+    }
+  });
+});
 
 videoElement.addEventListener('loadedmetadata', () => {
   canvasElement.width = videoElement.videoWidth;
@@ -245,22 +288,3 @@ function drawJewelry(faceLandmarks, handLandmarks, ctx) {
     });
   }
 }
-
-// ================== CAPTURE FUNCTION ==================
-captureBtn.addEventListener('click', () => {
-  const captureCanvas = document.createElement('canvas');
-  const captureCtx = captureCanvas.getContext('2d');
-
-  captureCanvas.width = canvasElement.width;
-  captureCanvas.height = canvasElement.height;
-
-  captureCtx.drawImage(videoElement, 0, 0, captureCanvas.width, captureCanvas.height);
-  captureCtx.drawImage(canvasElement, 0, 0, captureCanvas.width, captureCanvas.height);
-
-  const dataURL = captureCanvas.toDataURL('image/png');
-
-  const link = document.createElement('a');
-  link.href = dataURL;
-  link.download = 'jewelry_capture.png';
-  link.click();
-});

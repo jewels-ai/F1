@@ -21,9 +21,7 @@
     <a id="location-btn" href="https://www.google.com/maps/place/50,+VP+St,+Vannarpet,+Coonoor,+Tamil+Nadu+643101" target="_blank" rel="noopener noreferrer">
       <img src="location_icon.png" alt="Location" />
     </a>
-    <button id="capture-btn">
-      <img src="camera_icon.png" alt="Capture" />
-    </button>
+    <button id="capture-btn">📸</button>
   </div>
   
   <div id="jewelry-mode" class="button-group">
@@ -39,6 +37,15 @@
   </div>
   
   <div id="jewelry-options" class="options-group" style="display: none;"></div>
+
+  <!-- Snapshot Modal -->
+  <div id="snapshot-modal" style="display: none;">
+    <img id="snapshot-preview" src="" alt="Snapshot" />
+    <div class="snapshot-buttons">
+      <button id="share-btn">Share</button>
+      <button id="close-snapshot-btn">Close</button>
+    </div>
+  </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.min.js"></script>
