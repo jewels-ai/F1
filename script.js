@@ -200,16 +200,17 @@ function drawJewelry(faceLandmarks, handLandmarks, ctx) {
 
 // ====== SNAPSHOT FUNCTIONS ======
 function takeSnapshot() {
-  if (!smoothedFaceLandmarks && !smoothedHandLandmarks) {
-    alert("No jewelry detected. Try again!");
-    return;
-  }
   const snapshotCanvas = document.createElement('canvas');
   snapshotCanvas.width = videoElement.videoWidth;
   snapshotCanvas.height = videoElement.videoHeight;
   const ctx = snapshotCanvas.getContext('2d');
+
+  // Draw the webcam feed
   ctx.drawImage(videoElement, 0, 0, snapshotCanvas.width, snapshotCanvas.height);
-  drawJewelry(smoothedFaceLandmarks, smoothedHandLandmarks, ctx);
+
+  // Draw the overlay canvas (with AR jewelry)
+  ctx.drawImage(canvasElement, 0, 0, snapshotCanvas.width, snapshotCanvas.height);
+
   lastSnapshotDataURL = snapshotCanvas.toDataURL('image/png');
   document.getElementById('snapshot-preview').src = lastSnapshotDataURL;
   document.getElementById('snapshot-modal').style.display = 'block';
@@ -224,16 +225,26 @@ function saveSnapshot() {
   document.body.removeChild(link);
 }
 
-function shareSnapshot() {
-  if (navigator.share) {
-    fetch(lastSnapshotDataURL)
-      .then(res => res.blob())
-      .then(blob => {
-        const file = new File([blob], 'jewelry-tryon.png', { type: 'image/png' });
-        navigator.share({ title: 'Jewelry Try-On', text: 'Check out my look!', files: [file] });
+async function shareSnapshot() {
+  if (navigator.canShare && navigator.canShare({ files: [] })) {
+    const res = await fetch(lastSnapshotDataURL);
+    const blob = await res.blob();
+    const file = new File([blob], 'jewelry-tryon.png', { type: blob.type });
+
+    try {
+      await navigator.share({
+        title: 'Jewelry Try-On',
+        text: 'Check out my look!',
+        files: [file]
       });
+    } catch (err) {
+      console.error("Share cancelled or failed", err);
+    }
   } else {
-    alert('Sharing not supported on this browser.');
+    // Fallback for unsupported browsers
+    const win = window.open();
+    win.document.write(`<img src="${lastSnapshotDataURL}" style="max-width:100%">`);
+    alert("Sharing not supported. Image opened in a new tab.");
   }
 }
 
