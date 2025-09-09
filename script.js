@@ -4,6 +4,7 @@ const canvasCtx = canvasElement.getContext('2d');
 
 const subcategoryButtons = document.getElementById('subcategory-buttons');
 const jewelryOptions = document.getElementById('jewelry-options');
+const captureBtn = document.getElementById('capture-btn');
 
 let earringImg = null;
 let necklaceImg = null;
@@ -244,3 +245,22 @@ function drawJewelry(faceLandmarks, handLandmarks, ctx) {
     });
   }
 }
+
+// ================== CAPTURE FUNCTION ==================
+captureBtn.addEventListener('click', () => {
+  const captureCanvas = document.createElement('canvas');
+  const captureCtx = captureCanvas.getContext('2d');
+
+  captureCanvas.width = canvasElement.width;
+  captureCanvas.height = canvasElement.height;
+
+  captureCtx.drawImage(videoElement, 0, 0, captureCanvas.width, captureCanvas.height);
+  captureCtx.drawImage(canvasElement, 0, 0, captureCanvas.width, captureCanvas.height);
+
+  const dataURL = captureCanvas.toDataURL('image/png');
+
+  const link = document.createElement('a');
+  link.href = dataURL;
+  link.download = 'jewelry_capture.png';
+  link.click();
+});
