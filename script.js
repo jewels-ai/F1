@@ -16,7 +16,7 @@ let smoothedFacePoints = {};
 let lastSnapshotDataURL = '';
 
 // ================== GOOGLE DRIVE CONFIG ==================
-const API_KEY = "YOUR_GOOGLE_API_KEY"; 
+const API_KEY = "AIzaSyA1JCqs3gl6TMVz1cwPIsTD2sefDPRr8OY"; 
 const driveFolders = {
   gold_earrings: "16wvDBpxaMgObqTQBxpM0PH1OAZbcNXcj",
   gold_necklaces: "1csT7TYA8lMbyuuIYAk2cMVYK9lRIT5Gz",
@@ -109,9 +109,7 @@ hands.onResults((results) => {
 });
 
 faceMesh.onResults((results) => {
-  // Clear canvas and draw video feed
-  canvasCtx.drawImage(videoElement, 0, 0, canvasElement.width, canvasElement.height);
-
+  canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
   if (results.multiFaceLandmarks?.length > 0) {
     const newLandmarks = results.multiFaceLandmarks[0];
     const factor = 0.2;
@@ -125,8 +123,6 @@ faceMesh.onResults((results) => {
   } else {
     smoothedFaceLandmarks = null;
   }
-
-  // Draw AR jewelry on top
   drawJewelry(smoothedFaceLandmarks, smoothedHandLandmarks, canvasCtx);
 });
 
@@ -202,11 +198,21 @@ function drawJewelry(faceLandmarks, handLandmarks, ctx) {
   }
 }
 
-// ====== SNAPSHOT FUNCTIONS ======
+// ====== SNAPSHOT FUNCTIONS (using html2canvas) ======
 function takeSnapshot() {
-  lastSnapshotDataURL = canvasElement.toDataURL('image/png');
-  document.getElementById('snapshot-preview').src = lastSnapshotDataURL;
-  document.getElementById('snapshot-modal').style.display = 'block';
+  const container = document.querySelector('.video-container');
+
+  html2canvas(container, {
+    useCORS: true,
+    allowTaint: true
+  }).then(canvas => {
+    lastSnapshotDataURL = canvas.toDataURL("image/png");
+    document.getElementById('snapshot-preview').src = lastSnapshotDataURL;
+    document.getElementById('snapshot-modal').style.display = 'block';
+  }).catch(err => {
+    console.error("Snapshot failed:", err);
+    alert("Could not capture snapshot. Try again.");
+  });
 }
 
 function saveSnapshot() {
@@ -223,6 +229,7 @@ async function shareSnapshot() {
     const res = await fetch(lastSnapshotDataURL);
     const blob = await res.blob();
     const file = new File([blob], 'jewelry-tryon.png', { type: blob.type });
+
     try {
       await navigator.share({
         title: 'Jewelry Try-On',
@@ -233,6 +240,7 @@ async function shareSnapshot() {
       console.error("Share cancelled or failed", err);
     }
   } else {
+    // Fallback for unsupported browsers
     const win = window.open();
     win.document.write(`<img src="${lastSnapshotDataURL}" style="max-width:100%">`);
     alert("Sharing not supported. Image opened in a new tab.");

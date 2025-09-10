@@ -9,8 +9,7 @@
 </head>
 <body>
   <div class="video-container">
-    <!-- Hide video, but keep it for mediapipe input -->
-    <video id="webcam" autoplay muted playsinline style="display:none;"></video>
+    <video id="webcam" autoplay muted playsinline></video>
     <canvas id="overlay"></canvas>
   </div>
 
@@ -56,9 +55,15 @@
     </div>
   </div>
 
+  <!-- Mediapipe + Camera -->
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
+
+  <!-- html2canvas -->
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+
+  <!-- Main App -->
   <script src="script.js"></script>
 </body>
 </html>
